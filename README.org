@@ -1,0 +1,39 @@
+* fido-preview
+
+File Preview For Fido.
+
+** Installation
+
+Emacs >= 28.1 is required.
+
+*** Manual
+
+Download the source code and put it wherever you like, e.g. into =~/.emacs.d/fido-preview/=
+
+#+begin_src shell :eval no
+git clone https://github.com/KarimAziev/fido-preview.git ~/.emacs.d/fido-preview/
+#+end_src
+
+Add the downloaded directory to the load path:
+
+#+begin_src elisp :eval no
+(add-to-list 'load-path "~/.emacs.d/fido-preview/")
+(require 'fido-preview)
+#+end_src
+
+#+begin_src elisp :eval no
+(use-package fido-preview
+  :straight (fido-preview
+             :repo "KarimAziev/fido-preview"
+             :type git
+             :host github)
+  :commands (fido-preview-file
+             fido-preview-find-file-other-window))
+#+end_src
+
+** Commands
+
+*** ~fido-preview-file~
+Preview =minibuffer-contents= if it is a file. Files with size greater than =large-file-warning-threshold= is ignored.
+*** ~fido-preview-find-file-other-window~
+Find file in other window and abort the current minibuffer. File is detected from =minibuffer-contents=.
