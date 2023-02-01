@@ -29,7 +29,7 @@
 
 ;;; Code:
 
-(defun fido--preview-file (file)
+(defun fido-preview--file (file)
   "Preview FILE or it's buffer without visiting."
   (let ((buffer (get-buffer-create "*fido-preview*")))
     (with-minibuffer-selected-window
@@ -91,7 +91,7 @@ Files with size greater than `large-file-warning-threshold' is ignored."
                          (> (file-attribute-size
                              (file-attributes file))
                             large-file-warning-threshold))))
-      (fido--preview-file file))))
+      (fido-preview--file file))))
 
 (provide 'fido-preview)
 ;;; fido-preview.el ends here
