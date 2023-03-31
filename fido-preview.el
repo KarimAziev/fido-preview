@@ -29,35 +29,39 @@
 
 ;;; Code:
 
+
 (defun fido-preview--file (file)
   "Preview FILE or it's buffer without visiting."
   (let ((buffer (get-buffer-create "*fido-preview*")))
     (with-minibuffer-selected-window
       (with-current-buffer (get-buffer-create buffer)
-        (erase-buffer)
-        (if-let ((buff (get-file-buffer file)))
-            (insert (with-current-buffer buff
-                      (buffer-string)))
-          (insert-file-contents file)
-          (let ((buffer-file-name file))
-            (delay-mode-hooks (set-auto-mode)
-                              (font-lock-ensure))))
-        (setq header-line-format
-              (abbreviate-file-name file))
-        (unless (get-buffer-window (current-buffer))
-          (pop-to-buffer-same-window (current-buffer)))))))
+        (let ((inhibit-read-only t))
+          (erase-buffer)
+          (if-let ((buff (get-file-buffer file)))
+              (insert (with-current-buffer buff
+                        (buffer-string)))
+            (insert-file-contents file)
+            (let ((buffer-file-name file))
+              (delay-mode-hooks (set-auto-mode)
+                                (font-lock-ensure))))
+          (setq header-line-format
+                (abbreviate-file-name file))
+          (unless (get-buffer-window (current-buffer))
+            (pop-to-buffer-same-window (current-buffer))))))))
 
 (defun fido-preview-get-file ()
   "Return FILE from `minibuffer-contents'."
-  (let ((content (minibuffer-contents)))
+  (let ((content (or (minibuffer-contents))))
     (when (and
            content
-           (string-empty-p content)
            (car completion-all-sorted-completions))
-      (setq content (car completion-all-sorted-completions)))
-    (when (and (file-exists-p content)
-               (file-readable-p content)
-               (file-name-absolute-p content))
+      (setq content
+            (car completion-all-sorted-completions)))
+    (when (and
+           content
+           (file-exists-p content)
+           (file-readable-p content)
+           (file-name-absolute-p content))
       (if (file-directory-p content)
           (let* ((dir (file-name-directory content))
                  (current (car completion-all-sorted-completions))
@@ -70,6 +74,26 @@
                        (file-readable-p file))
               file))
         content))))
+
+;;;###autoload
+(defun fido-preview-file-scroll-down ()
+  "Scroll down by the minibuffer height lines."
+  (interactive)
+  (let ((count (window-height nil t)))
+    (when (> count 0)
+      (dotimes (_i count)
+        (when (fboundp 'icomplete-backward-completions)
+          (icomplete-backward-completions))))))
+
+;;;###autoload
+(defun fido-preview-file-scroll-up ()
+  "Scroll upward by the minibuffer height lines."
+  (interactive)
+  (let ((count (window-height nil t)))
+    (when (> count 0)
+      (dotimes (_i count)
+        (when (fboundp 'icomplete-forward-completions)
+          (icomplete-forward-completions))))))
 
 ;;;###autoload
 (defun fido-preview-find-file-other-window ()
