@@ -37,7 +37,7 @@
       (with-current-buffer (get-buffer-create buffer)
         (let ((inhibit-read-only t))
           (erase-buffer)
-          (if-let ((buff (get-file-buffer file)))
+          (if-let* ((buff (get-file-buffer file)))
               (insert (with-current-buffer buff
                         (buffer-string)))
             (insert-file-contents file)
@@ -100,7 +100,7 @@
   "Find file in other window and abort the current minibuffer.
 File is detected from `minibuffer-contents'."
   (interactive)
-  (when-let ((file (fido-preview-get-file)))
+  (when-let* ((file (fido-preview-get-file)))
     (run-at-time 0.2 nil #'find-file-other-window file)
     (abort-minibuffers)))
 
@@ -109,7 +109,7 @@ File is detected from `minibuffer-contents'."
   "Preview `minibuffer-contents' if it is a file.
 Files with size greater than `large-file-warning-threshold' is ignored."
   (interactive)
-  (when-let ((file (fido-preview-get-file)))
+  (when-let* ((file (fido-preview-get-file)))
     (when (and (not (file-directory-p file))
                (not (and large-file-warning-threshold
                          (> (file-attribute-size
